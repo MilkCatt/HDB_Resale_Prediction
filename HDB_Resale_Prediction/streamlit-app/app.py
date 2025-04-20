@@ -33,7 +33,29 @@ econ_data = pd.read_csv('indicators.csv', parse_dates=['Date'])
 econ_data.set_index('Date', inplace=True)
 
 # === Step 3: User Input ===
-user_date = pd.to_datetime("2023-08-01")
+user_date = st.date_input("Select Resale Date", value=pd.to_datetime("2023-08-01"))
+user_date = pd.to_datetime(user_date)
+# Extract dropdown options
+town_options = sorted([col.replace('town_', '') for col in expected_features if col.startswith('town_')])
+flat_model_options = sorted([col.replace('flat_model_', '') for col in expected_features if col.startswith('flat_model_')])
+
+# Streamlit Inputs
+selected_town = st.selectbox("Select Town", town_options)
+selected_model = st.selectbox("Select Flat Model", flat_model_options)
+
+# === Additional User Inputs ===
+floor_area = st.number_input("Floor Area (sqm)", min_value=30, max_value=250, value=90, step=1)
+
+storey_options = [
+    '01 TO 03', '04 TO 06', '07 TO 09', '10 TO 12',
+    '13 TO 15', '16 TO 18', '19 TO 21', '22 TO 24', '25 TO 27',
+    '28 TO 30', '31 TO 33', '34 TO 36', '37 TO 39', '40 TO 42',
+    '43 TO 45', '46 TO 48', '49 TO 51'
+]
+selected_storey = st.selectbox("Storey Range", storey_options)
+
+lease_left = st.number_input("Lease Months Left", min_value=1, max_value=999, value=900, step=1)
+
 
 # === Step 4: Fetch macro data ===
 def fetch_macro_indicators(date, econ_df):
@@ -46,26 +68,20 @@ macro = fetch_macro_indicators(user_date, econ_data)
 
 # === Step 5: Default values for static fields ===
 default_values = {
-    'storey_range': '04 TO 06',
-    'floor_area_sqm': 90,
-    'flat_type': '4 ROOM',
+    'storey_range': storey_options.index(selected_storey),
+    'floor_area_sqm': floor_area,
+    'flat_model': selected_model,
+    'floor_area_sqm': floor_area,
+    'lease_months_left': lease_left,
+    'town_': selected_town,
     'date': user_date,
     'm_from2017': 1 if user_date >= pd.to_datetime("2017-01-01") else 0,
-    'lease_months_left': 900,
     'assets': macro['    Assets'],
     'liabilities': macro['    Liabilities'],
     'gdp in chained (2015) dollars': macro['GDP In Chained (2015) Dollars'],
     'total unemployment rate, (sa)': macro['Total Unemployment Rate, (SA)'],
     'mas core inflation measure': macro['MAS Core Inflation Measure']
 }
-
-# Extract dropdown options
-town_options = sorted([col.replace('town_', '') for col in expected_features if col.startswith('town_')])
-flat_model_options = sorted([col.replace('flat_model_', '') for col in expected_features if col.startswith('flat_model_')])
-
-# Streamlit Inputs
-selected_town = st.selectbox("Select Town", town_options)
-selected_model = st.selectbox("Select Flat Model", flat_model_options)
 
 # Generate one-hot encodings
 one_hot_features = {key: 0 for key in expected_features if key.startswith('town_') or key.startswith('flat_model_')}
@@ -100,11 +116,6 @@ from joblib import load
 xgb_best_model = joblib.load('xgb_best_model.pkl')
 
 
-# Input for date
-input_date = st.date_input("Select the date", pd.to_datetime("2023-01-01"))
-
-# Convert the date to the required format
-input_date_numeric = pd.to_datetime(input_date).timestamp() # Convert to timestamp
 
 # Input for other features (you can add more inputs as needed)
 # For example, let's assume you have features like 'location', 'size', etc.
