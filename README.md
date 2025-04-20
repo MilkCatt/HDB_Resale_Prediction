@@ -9,7 +9,12 @@ The folder structure is arranged like this:
 .
 ├── baseline_nn_weights
 ├── data
-│   └── ResaleflatpricesbasedonregistrationdatefromJan2017onwards.csv
+│   ├── data_macro.csv
+│   ├── ResaleflatpricesbasedonregistrationdatefromJan2017onwards.csv
+│   ...
+│   └── valid_data_w_macro.csv
 ├── HDB_Resale_Prediction
 └── macro_data
 ```
+
+To run the streamlit app, refer to the HDB_Resale_Prediction folder
