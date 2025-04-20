@@ -7,8 +7,7 @@ This project is a Streamlit application designed for data analysis and visualiza
 ```
 streamlit-app
 ├── app.py                    # Main Streamlit application
-├── data
-│   └── indicators.csv        # Macroeconomic dataset used by the app
+├── indicators.csv        # Macroeconomic dataset used by the app
 ├── xgb_best_model.pkl        # Trained XGBoost regression model
 ├── requirements.txt          # Python packages required to run the app
 └── README.md                 # Documentation for the project
